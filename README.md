@@ -1,4 +1,5 @@
 # Como fazer commit no Github com VSCode
+### Use gitkraken caso não queira digitar comandos, pois as vezes ele buga
 ### 1°
 ```
 git init
