@@ -1,13 +1,12 @@
 import os
 import time
 from sqlalchemy import create_engine, Column, Integer, String, Text, Numeric, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker, relationship, declarative_base  # Mudança aqui
 
 DATABASE_URL = "mysql+pymysql://root:@localhost/tde"
 
 engine = create_engine(DATABASE_URL)
-Base = declarative_base()
+Base = declarative_base()  # Função movida para sqlalchemy.orm
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
@@ -237,14 +236,14 @@ def principal():
             id_cliente = int(input("ID do cliente: "))
             cliente = ler_cliente(id_cliente)
             if cliente:
-                print(f"ID: {cliente.id}, Nome: {cliente.nome}, Telefone: {cliente.telefone}, Email: {cliente.email}")
+                print(f"Cliente: {cliente.nome}, Telefone: {cliente.telefone}, Email: {cliente.email}")
         
         elif escolha == "3":
             id_cliente = int(input("ID do cliente: "))
-            nome = input("Novo nome (deixe em branco para não alterar): ")
-            telefone = input("Novo telefone (deixe em branco para não alterar): ")
-            email = input("Novo email (deixe em branco para não alterar): ")
-            atualizar_cliente(id_cliente, nome if nome else None, telefone if telefone else None, email if email else None)
+            nome = input("Nome do cliente (ou deixe em branco): ")
+            telefone = input("Telefone do cliente (ou deixe em branco): ")
+            email = input("Email do cliente (ou deixe em branco): ")
+            atualizar_cliente(id_cliente, nome, telefone, email)
         
         elif escolha == "4":
             id_cliente = int(input("ID do cliente: "))
@@ -253,25 +252,25 @@ def principal():
         elif escolha == "5":
             nome = input("Nome do pet: ")
             especie = input("Espécie do pet: ")
-            raca = input("Raça do pet: ")
-            idade = int(input("Idade do pet: "))
-            id_dono = int(input("ID do dono (cliente): "))
+            raca = input("Raça do pet (ou deixe em branco): ")
+            idade = int(input("Idade do pet (ou deixe em branco): "))
+            id_dono = int(input("ID do dono: "))
             adicionar_pet(nome, especie, raca, idade, id_dono)
         
         elif escolha == "6":
             id_pet = int(input("ID do pet: "))
             pet = ler_pet(id_pet)
             if pet:
-                print(f"ID: {pet.id}, Nome: {pet.nome}, Espécie: {pet.especie}, Raça: {pet.raca}, Idade: {pet.idade}, ID do Dono: {pet.id_dono}")
+                print(f"Pet: {pet.nome}, Espécie: {pet.especie}, Raça: {pet.raca}, Idade: {pet.idade}")
         
         elif escolha == "7":
             id_pet = int(input("ID do pet: "))
-            nome = input("Novo nome (deixe em branco para não alterar): ")
-            especie = input("Nova espécie (deixe em branco para não alterar): ")
-            raca = input("Nova raça (deixe em branco para não alterar): ")
-            idade = input("Nova idade (deixe em branco para não alterar): ")
-            id_dono = input("Novo ID do dono (deixe em branco para não alterar): ")
-            atualizar_pet(id_pet, nome if nome else None, especie if especie else None, raca if raca else None, int(idade) if idade else None, int(id_dono) if id_dono else None)
+            nome = input("Nome do pet (ou deixe em branco): ")
+            especie = input("Espécie do pet (ou deixe em branco): ")
+            raca = input("Raça do pet (ou deixe em branco): ")
+            idade = input("Idade do pet (ou deixe em branco): ")
+            id_dono = input("ID do dono (ou deixe em branco): ")
+            atualizar_pet(id_pet, nome, especie, raca, idade, id_dono)
         
         elif escolha == "8":
             id_pet = int(input("ID do pet: "))
@@ -279,7 +278,7 @@ def principal():
         
         elif escolha == "9":
             nome = input("Nome do serviço: ")
-            descricao = input("Descrição do serviço: ")
+            descricao = input("Descrição do serviço (ou deixe em branco): ")
             preco = float(input("Preço do serviço: "))
             adicionar_servico(nome, descricao, preco)
         
@@ -287,14 +286,14 @@ def principal():
             id_servico = int(input("ID do serviço: "))
             servico = ler_servico(id_servico)
             if servico:
-                print(f"ID: {servico.id}, Nome: {servico.nome}, Descrição: {servico.descricao}, Preço: {servico.preco}")
+                print(f"Serviço: {servico.nome}, Descrição: {servico.descricao}, Preço: {servico.preco}")
         
         elif escolha == "11":
             id_servico = int(input("ID do serviço: "))
-            nome = input("Novo nome (deixe em branco para não alterar): ")
-            descricao = input("Nova descrição (deixe em branco para não alterar): ")
-            preco = input("Novo preço (deixe em branco para não alterar): ")
-            atualizar_servico(id_servico, nome if nome else None, descricao if descricao else None, float(preco) if preco else None)
+            nome = input("Nome do serviço (ou deixe em branco): ")
+            descricao = input("Descrição do serviço (ou deixe em branco): ")
+            preco = input("Preço do serviço (ou deixe em branco): ")
+            atualizar_servico(id_servico, nome, descricao, preco)
         
         elif escolha == "12":
             id_servico = int(input("ID do serviço: "))
@@ -310,18 +309,20 @@ def principal():
             id_taxa = int(input("ID da taxa de transporte: "))
             taxa = ler_taxidog(id_taxa)
             if taxa:
-                print(f"ID: {taxa.id}, Preço: {taxa.preco}, Tempo de Ida: {taxa.tempo_ida}, Tempo de Volta: {taxa.tempo_volta}")
+                print(f"Preço: {taxa.preco}, Tempo de ida: {taxa.tempo_ida}, Tempo de volta: {taxa.tempo_volta}")
         
         elif escolha == "15":
             id_taxa = int(input("ID da taxa de transporte: "))
-            preco = input("Novo preço (deixe em branco para não alterar): ")
-            tempo_ida = input("Novo tempo de ida (deixe em branco para não alterar): ")
-            tempo_volta = input("Novo tempo de volta (deixe em branco para não alterar): ")
-            atualizar_taxidog(id_taxa, float(preco) if preco else None, int(tempo_ida) if tempo_ida else None, int(tempo_volta) if tempo_volta else None)
+            preco = input("Preço da taxa (ou deixe em branco): ")
+            tempo_ida = input("Tempo de ida (ou deixe em branco): ")
+            tempo_volta = input("Tempo de volta (ou deixe em branco): ")
+            atualizar_taxidog(id_taxa, preco, tempo_ida, tempo_volta)
         
         elif escolha == "16":
             id_taxa = int(input("ID da taxa de transporte: "))
             deletar_taxidog(id_taxa)
+        
+        time.sleep(2)
 
 if __name__ == "__main__":
     principal()
