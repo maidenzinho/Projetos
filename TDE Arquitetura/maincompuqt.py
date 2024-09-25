@@ -1,13 +1,12 @@
 import sys
-from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QComboBox)
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import Column, Integer, String, Text, Numeric, ForeignKey
-from sqlalchemy.orm import relationship
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QInputDialog, QLineEdit, QTabWidget, QPushButton, QHBoxLayout
+from sqlalchemy import create_engine, Column, Integer, String, Text, Numeric, ForeignKey
+from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 
 DATABASE_URL = "mysql+pymysql://root:@localhost/tde"
 engine = create_engine(DATABASE_URL)
 Base = declarative_base()
+Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -43,281 +42,293 @@ class Taxidog(Base):
     tempo_ida = Column(Integer, nullable=False)
     tempo_volta = Column(Integer, nullable=False)
 
-Base.metadata.create_all(engine)
-
-class Interface(QWidget):
+class PetshopApp(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Petshop")
-        self.setGeometry(100, 100, 400, 400)
+        self.setGeometry(100, 100, 900, 600)  # Definindo o tamanho inicial da janela
 
-        self.secao_menu = QLabel("Escolha uma seção:")
-        self.combobox_secao = QComboBox()
-        self.combobox_secao.addItems(["Cliente", "Pet", "Serviço", "TaxiDog"])
-        self.combobox_secao.currentIndexChanged.connect(self.alterar_secao)
+        layout_principal = QVBoxLayout()
+        self.abas = QTabWidget()
+        layout_principal.addWidget(self.abas)
 
-        self.layout_principal = QVBoxLayout()
-        self.layout_principal.addWidget(self.secao_menu)
-        self.layout_principal.addWidget(self.combobox_secao)
+        self.setLayout(layout_principal)
 
-        self.widget_secao = QWidget()
-        self.layout_secao = QVBoxLayout()
-        self.widget_secao.setLayout(self.layout_secao)
-        self.layout_principal.addWidget(self.widget_secao)
+        self.criar_aba_cliente()
+        self.criar_aba_pet()
+        self.criar_aba_servico()
+        self.criar_aba_taxidog()
 
-        self.setLayout(self.layout_principal)
-        self.alterar_secao()
+        self.show()
 
-    def alterar_secao(self):
-        secao = self.combobox_secao.currentText()
-        self.limpar_secao()
+    def criar_aba_cliente(self):
+        aba_cliente = QWidget()
+        layout = QVBoxLayout()
 
-        if secao == "Cliente":
-            self.secao_cliente()
-        elif secao == "Pet":
-            self.secao_pet()
-        elif secao == "Serviço":
-            self.secao_servico()
-        elif secao == "TaxiDog":
-            self.secao_taxidog()
+        botao_adicionar = QPushButton("Adicionar Cliente")
+        botao_adicionar.clicked.connect(self.adicionar_cliente)
 
-    def limpar_secao(self):
-        for i in reversed(range(self.layout_secao.count())):
-            widget = self.layout_secao.itemAt(i).widget()
-            if widget is not None:
-                widget.deleteLater()
+        botao_atualizar = QPushButton("Atualizar Cliente")
+        botao_atualizar.clicked.connect(self.atualizar_cliente)
 
-    def secao_cliente(self):
-        self.nome_label = QLabel("Nome:")
-        self.nome_input = QLineEdit()
+        botao_deletar = QPushButton("Deletar Cliente")
+        botao_deletar.clicked.connect(self.deletar_cliente)
 
-        self.telefone_label = QLabel("Telefone:")
-        self.telefone_input = QLineEdit()
+        botao_listar = QPushButton("Listar Clientes")
+        botao_listar.clicked.connect(self.listar_clientes)
 
-        self.email_label = QLabel("Email:")
-        self.email_input = QLineEdit()
+        layout.addWidget(botao_adicionar)
+        layout.addWidget(botao_atualizar)
+        layout.addWidget(botao_deletar)
+        layout.addWidget(botao_listar)
 
-        self.botao_adicionar_cliente = QPushButton("Adicionar Cliente")
-        self.botao_adicionar_cliente.clicked.connect(self.adicionar_cliente)
+        aba_cliente.setLayout(layout)
+        self.abas.addTab(aba_cliente, "Cliente")
 
-        self.botao_atualizar_cliente = QPushButton("Atualizar Cliente")
-        self.botao_atualizar_cliente.clicked.connect(self.atualizar_cliente)
+    def criar_aba_pet(self):
+        aba_pet = QWidget()
+        layout = QVBoxLayout()
 
-        self.layout_secao.addWidget(self.nome_label)
-        self.layout_secao.addWidget(self.nome_input)
-        self.layout_secao.addWidget(self.telefone_label)
-        self.layout_secao.addWidget(self.telefone_input)
-        self.layout_secao.addWidget(self.email_label)
-        self.layout_secao.addWidget(self.email_input)
-        self.layout_secao.addWidget(self.botao_adicionar_cliente)
-        self.layout_secao.addWidget(self.botao_atualizar_cliente)
+        botao_adicionar = QPushButton("Adicionar Pet")
+        botao_adicionar.clicked.connect(self.adicionar_pet)
+
+        botao_atualizar = QPushButton("Atualizar Pet")
+        botao_atualizar.clicked.connect(self.atualizar_pet)
+
+        botao_deletar = QPushButton("Deletar Pet")
+        botao_deletar.clicked.connect(self.deletar_pet)
+
+        botao_listar = QPushButton("Listar Pets")
+        botao_listar.clicked.connect(self.listar_pets)
+
+        layout.addWidget(botao_adicionar)
+        layout.addWidget(botao_atualizar)
+        layout.addWidget(botao_deletar)
+        layout.addWidget(botao_listar)
+
+        aba_pet.setLayout(layout)
+        self.abas.addTab(aba_pet, "Pet")
+
+    def criar_aba_servico(self):
+        aba_servico = QWidget()
+        layout = QVBoxLayout()
+
+        botao_adicionar = QPushButton("Adicionar Serviço")
+        botao_adicionar.clicked.connect(self.adicionar_servico)
+
+        botao_atualizar = QPushButton("Atualizar Serviço")
+        botao_atualizar.clicked.connect(self.atualizar_servico)
+
+        botao_deletar = QPushButton("Deletar Serviço")
+        botao_deletar.clicked.connect(self.deletar_servico)
+
+        botao_listar = QPushButton("Listar Serviços")
+        botao_listar.clicked.connect(self.listar_servicos)
+
+        layout.addWidget(botao_adicionar)
+        layout.addWidget(botao_atualizar)
+        layout.addWidget(botao_deletar)
+        layout.addWidget(botao_listar)
+
+        aba_servico.setLayout(layout)
+        self.abas.addTab(aba_servico, "Serviço")
+
+    def criar_aba_taxidog(self):
+        aba_taxidog = QWidget()
+        layout = QVBoxLayout()
+
+        botao_adicionar = QPushButton("Adicionar Taxidog")
+        botao_adicionar.clicked.connect(self.adicionar_taxidog)
+
+        botao_atualizar = QPushButton("Atualizar Taxidog")
+        botao_atualizar.clicked.connect(self.atualizar_taxidog)
+
+        botao_deletar = QPushButton("Deletar Taxidog")
+        botao_deletar.clicked.connect(self.deletar_taxidog)
+
+        botao_listar = QPushButton("Listar Taxidog")
+        botao_listar.clicked.connect(self.listar_taxidog)
+
+        layout.addWidget(botao_adicionar)
+        layout.addWidget(botao_atualizar)
+        layout.addWidget(botao_deletar)
+        layout.addWidget(botao_listar)
+
+        aba_taxidog.setLayout(layout)
+        self.abas.addTab(aba_taxidog, "TaxiDog")
+
+    def exibir_dados(self, dados, colunas):
+        tabela = QTableWidget()
+        tabela.setRowCount(len(dados))
+        tabela.setColumnCount(len(colunas))
+        tabela.setHorizontalHeaderLabels(colunas)
+
+        for i, dado in enumerate(dados):
+            for j, atributo in enumerate(colunas):
+                valor = getattr(dado, atributo.lower())
+                tabela.setItem(i, j, QTableWidgetItem(str(valor)))
+
+        self.abas.addTab(tabela, "Resultados")
+        self.abas.tabBar().setTabsClosable(True)
+        self.abas.tabBar().tabCloseRequested.connect(lambda: self.fechar_aba(self.abas.indexOf(tabela)))
+        self.abas.setCurrentWidget(tabela)
+
+    def fechar_aba(self, index):
+        self.abas.removeTab(index)
 
     def adicionar_cliente(self):
-        nome = self.nome_input.text()
-        telefone = self.telefone_input.text()
-        email = self.email_input.text()
-        if nome and telefone and email:
+        nome, ok_nome = QInputDialog.getText(self, "Adicionar Cliente", "Nome do Cliente:")
+        telefone, ok_telefone = QInputDialog.getText(self, "Adicionar Cliente", "Telefone do Cliente:")
+        email, ok_email = QInputDialog.getText(self, "Adicionar Cliente", "Email do Cliente:")
+        if ok_nome and ok_telefone and ok_email:
             novo_cliente = Cliente(nome=nome, telefone=telefone, email=email)
             session.add(novo_cliente)
             session.commit()
-            QMessageBox.information(self, "Sucesso", f"Cliente '{nome}' adicionado com sucesso!")
-        else:
-            QMessageBox.warning(self, "Erro", "Preencha todos os campos")
 
     def atualizar_cliente(self):
-        email = self.email_input.text()
-        cliente = session.query(Cliente).filter(Cliente.email == email).first()
-        if cliente:
-            nome = self.nome_input.text()
-            telefone = self.telefone_input.text()
-            if nome:
-                cliente.nome = nome
-            if telefone:
-                cliente.telefone = telefone
-            session.commit()
-            QMessageBox.information(self, "Sucesso", f"Cliente '{email}' atualizado com sucesso!")
-        else:
-            QMessageBox.warning(self, "Erro", f"Cliente com email '{email}' não encontrado.")
+        id_cliente, ok = QInputDialog.getInt(self, "Atualizar Cliente", "Digite o ID do Cliente:")
+        if ok:
+            cliente = session.query(Cliente).filter_by(id=id_cliente).first()
+            if cliente:
+                nome, ok_nome = QInputDialog.getText(self, "Atualizar Cliente", "Nome:", QLineEdit.Normal, cliente.nome)
+                telefone, ok_telefone = QInputDialog.getText(self, "Atualizar Cliente", "Telefone:", QLineEdit.Normal, cliente.telefone)
+                email, ok_email = QInputDialog.getText(self, "Atualizar Cliente", "Email:", QLineEdit.Normal, cliente.email)
 
-    def secao_pet(self):
-        self.nome_pet_label = QLabel("Nome do Pet:")
-        self.nome_pet_input = QLineEdit()
+                if ok_nome and ok_telefone and ok_email:
+                    cliente.nome = nome
+                    cliente.telefone = telefone
+                    cliente.email = email
+                    session.commit()
 
-        self.especie_label = QLabel("Espécie:")
-        self.especie_input = QLineEdit()
+    def deletar_cliente(self):
+        id_cliente, ok = QInputDialog.getInt(self, "Deletar Cliente", "Digite o ID do Cliente para excluir:")
+        if ok:
+            cliente = session.query(Cliente).filter_by(id=id_cliente).first()
+            if cliente:
+                session.delete(cliente)
+                session.commit()
 
-        self.raca_label = QLabel("Raça:")
-        self.raca_input = QLineEdit()
-
-        self.idade_label = QLabel("Idade:")
-        self.idade_input = QLineEdit()
-
-        self.dono_label = QLabel("ID do Dono:")
-        self.dono_input = QLineEdit()
-
-        self.botao_adicionar_pet = QPushButton("Adicionar Pet")
-        self.botao_adicionar_pet.clicked.connect(self.adicionar_pet)
-
-        self.botao_atualizar_pet = QPushButton("Atualizar Pet")
-        self.botao_atualizar_pet.clicked.connect(self.atualizar_pet)
-
-        self.layout_secao.addWidget(self.nome_pet_label)
-        self.layout_secao.addWidget(self.nome_pet_input)
-        self.layout_secao.addWidget(self.especie_label)
-        self.layout_secao.addWidget(self.especie_input)
-        self.layout_secao.addWidget(self.raca_label)
-        self.layout_secao.addWidget(self.raca_input)
-        self.layout_secao.addWidget(self.idade_label)
-        self.layout_secao.addWidget(self.idade_input)
-        self.layout_secao.addWidget(self.dono_label)
-        self.layout_secao.addWidget(self.dono_input)
-        self.layout_secao.addWidget(self.botao_adicionar_pet)
-        self.layout_secao.addWidget(self.botao_atualizar_pet)
+    def listar_clientes(self):
+        clientes = session.query(Cliente).all()
+        colunas = ['id', 'nome', 'telefone', 'email']
+        self.exibir_dados(clientes, colunas)
 
     def adicionar_pet(self):
-        nome = self.nome_pet_input.text()
-        especie = self.especie_input.text()
-        raca = self.raca_input.text()
-        idade = self.idade_input.text()
-        id_dono = self.dono_input.text()
-        if nome and especie and id_dono:
+        nome, ok_nome = QInputDialog.getText(self, "Adicionar Pet", "Nome do Pet:")
+        especie, ok_especie = QInputDialog.getText(self, "Adicionar Pet", "Espécie do Pet:")
+        raca, ok_raca = QInputDialog.getText(self, "Adicionar Pet", "Raça do Pet:")
+        idade, ok_idade = QInputDialog.getInt(self, "Adicionar Pet", "Idade do Pet:")
+        id_dono, ok_id_dono = QInputDialog.getInt(self, "Adicionar Pet", "ID do Dono do Pet:")
+        if ok_nome and ok_especie and ok_raca and ok_idade and ok_id_dono:
             novo_pet = Pet(nome=nome, especie=especie, raca=raca, idade=idade, id_dono=id_dono)
             session.add(novo_pet)
             session.commit()
-            QMessageBox.information(self, "Sucesso", f"Pet '{nome}' adicionado com sucesso!")
-        else:
-            QMessageBox.warning(self, "Erro", "Preencha os campos obrigatórios.")
 
     def atualizar_pet(self):
-        id_dono = self.dono_input.text()
-        pet = session.query(Pet).filter(Pet.id_dono == id_dono).first()
-        if pet:
-            nome = self.nome_pet_input.text()
-            especie = self.especie_input.text()
-            raca = self.raca_input.text()
-            idade = self.idade_input.text()
-            if nome:
-                pet.nome = nome
-            if especie:
-                pet.especie = especie
-            if raca:
-                pet.raca = raca
-            if idade:
-                pet.idade = idade
-            session.commit()
-            QMessageBox.information(self, "Sucesso", f"Pet atualizado com sucesso!")
-        else:
-            QMessageBox.warning(self, "Erro", f"Pet não encontrado.")
+        id_pet, ok = QInputDialog.getInt(self, "Atualizar Pet", "Digite o ID do Pet:")
+        if ok:
+            pet = session.query(Pet).filter_by(id=id_pet).first()
+            if pet:
+                nome, ok_nome = QInputDialog.getText(self, "Atualizar Pet", "Nome:", QLineEdit.Normal, pet.nome)
+                especie, ok_especie = QInputDialog.getText(self, "Atualizar Pet", "Espécie:", QLineEdit.Normal, pet.especie)
+                raca, ok_raca = QInputDialog.getText(self, "Atualizar Pet", "Raça:", QLineEdit.Normal, pet.raca)
+                idade, ok_idade = QInputDialog.getInt(self, "Atualizar Pet", "Idade:", QLineEdit.Normal, pet.idade)
 
-    def secao_servico(self):
-        self.nome_servico_label = QLabel("Nome do Serviço:")
-        self.nome_servico_input = QLineEdit()
+                if ok_nome and ok_especie and ok_raca and ok_idade:
+                    pet.nome = nome
+                    pet.especie = especie
+                    pet.raca = raca
+                    pet.idade = idade
+                    session.commit()
 
-        self.descricao_label = QLabel("Descrição:")
-        self.descricao_input = QLineEdit()
+    def deletar_pet(self):
+        id_pet, ok = QInputDialog.getInt(self, "Deletar Pet", "Digite o ID do Pet para excluir:")
+        if ok:
+            pet = session.query(Pet).filter_by(id=id_pet).first()
+            if pet:
+                session.delete(pet)
+                session.commit()
 
-        self.preco_label = QLabel("Preço:")
-        self.preco_input = QLineEdit()
-
-        self.botao_adicionar_servico = QPushButton("Adicionar Serviço")
-        self.botao_adicionar_servico.clicked.connect(self.adicionar_servico)
-
-        self.botao_atualizar_servico = QPushButton("Atualizar Serviço")
-        self.botao_atualizar_servico.clicked.connect(self.atualizar_servico)
-
-        self.layout_secao.addWidget(self.nome_servico_label)
-        self.layout_secao.addWidget(self.nome_servico_input)
-        self.layout_secao.addWidget(self.descricao_label)
-        self.layout_secao.addWidget(self.descricao_input)
-        self.layout_secao.addWidget(self.preco_label)
-        self.layout_secao.addWidget(self.preco_input)
-        self.layout_secao.addWidget(self.botao_adicionar_servico)
-        self.layout_secao.addWidget(self.botao_atualizar_servico)
+    def listar_pets(self):
+        pets = session.query(Pet).all()
+        colunas = ['id', 'nome', 'especie', 'raca', 'idade', 'id_dono']
+        self.exibir_dados(pets, colunas)
 
     def adicionar_servico(self):
-        nome = self.nome_servico_input.text()
-        descricao = self.descricao_input.text()
-        preco = self.preco_input.text()
-        if nome and preco:
+        nome, ok_nome = QInputDialog.getText(self, "Adicionar Serviço", "Nome do Serviço:")
+        descricao, ok_descricao = QInputDialog.getText(self, "Adicionar Serviço", "Descrição do Serviço:")
+        preco, ok_preco = QInputDialog.getDouble(self, "Adicionar Serviço", "Preço do Serviço:")
+        if ok_nome and ok_descricao and ok_preco:
             novo_servico = Servico(nome=nome, descricao=descricao, preco=preco)
             session.add(novo_servico)
             session.commit()
-            QMessageBox.information(self, "Sucesso", f"Serviço '{nome}' adicionado com sucesso!")
-        else:
-            QMessageBox.warning(self, "Erro", "Preencha os campos obrigatórios.")
 
     def atualizar_servico(self):
-        nome = self.nome_servico_input.text()
-        servico = session.query(Servico).filter(Servico.nome == nome).first()
-        if servico:
-            descricao = self.descricao_input.text()
-            preco = self.preco_input.text()
-            if descricao:
-                servico.descricao = descricao
-            if preco:
-                servico.preco = preco
-            session.commit()
-            QMessageBox.information(self, "Sucesso", f"Serviço '{nome}' atualizado com sucesso!")
-        else:
-            QMessageBox.warning(self, "Erro", f"Serviço '{nome}' não encontrado.")
+        id_servico, ok = QInputDialog.getInt(self, "Atualizar Serviço", "Digite o ID do Serviço:")
+        if ok:
+            servico = session.query(Servico).filter_by(id=id_servico).first()
+            if servico:
+                nome, ok_nome = QInputDialog.getText(self, "Atualizar Serviço", "Nome:", QLineEdit.Normal, servico.nome)
+                descricao, ok_descricao = QInputDialog.getText(self, "Atualizar Serviço", "Descrição:", QLineEdit.Normal, servico.descricao)
+                preco, ok_preco = QInputDialog.getDouble(self, "Atualizar Serviço", "Preço:", QLineEdit.Normal, servico.preco)
 
-    def secao_taxidog(self):
-        self.preco_taxidog_label = QLabel("Preço do TaxiDog:")
-        self.preco_taxidog_input = QLineEdit()
+                if ok_nome and ok_descricao and ok_preco:
+                    servico.nome = nome
+                    servico.descricao = descricao
+                    servico.preco = preco
+                    session.commit()
 
-        self.tempo_ida_label = QLabel("Tempo de Ida:")
-        self.tempo_ida_input = QLineEdit()
+    def deletar_servico(self):
+        id_servico, ok = QInputDialog.getInt(self, "Deletar Serviço", "Digite o ID do Serviço para excluir:")
+        if ok:
+            servico = session.query(Servico).filter_by(id=id_servico).first()
+            if servico:
+                session.delete(servico)
+                session.commit()
 
-        self.tempo_volta_label = QLabel("Tempo de Volta:")
-        self.tempo_volta_input = QLineEdit()
-
-        self.botao_adicionar_taxidog = QPushButton("Adicionar TaxiDog")
-        self.botao_adicionar_taxidog.clicked.connect(self.adicionar_taxidog)
-
-        self.botao_atualizar_taxidog = QPushButton("Atualizar TaxiDog")
-        self.botao_atualizar_taxidog.clicked.connect(self.atualizar_taxidog)
-
-        self.layout_secao.addWidget(self.preco_taxidog_label)
-        self.layout_secao.addWidget(self.preco_taxidog_input)
-        self.layout_secao.addWidget(self.tempo_ida_label)
-        self.layout_secao.addWidget(self.tempo_ida_input)
-        self.layout_secao.addWidget(self.tempo_volta_label)
-        self.layout_secao.addWidget(self.tempo_volta_input)
-        self.layout_secao.addWidget(self.botao_adicionar_taxidog)
-        self.layout_secao.addWidget(self.botao_atualizar_taxidog)
+    def listar_servicos(self):
+        servicos = session.query(Servico).all()
+        colunas = ['id', 'nome', 'descricao', 'preco']
+        self.exibir_dados(servicos, colunas)
 
     def adicionar_taxidog(self):
-        preco = self.preco_taxidog_input.text()
-        tempo_ida = self.tempo_ida_input.text()
-        tempo_volta = self.tempo_volta_input.text()
-        if preco and tempo_ida and tempo_volta:
+        preco, ok_preco = QInputDialog.getDouble(self, "Adicionar Taxidog", "Preço do TaxiDog:")
+        tempo_ida, ok_tempo_ida = QInputDialog.getInt(self, "Adicionar Taxidog", "Tempo de Ida (min):")
+        tempo_volta, ok_tempo_volta = QInputDialog.getInt(self, "Adicionar Taxidog", "Tempo de Volta (min):")
+        if ok_preco and ok_tempo_ida and ok_tempo_volta:
             novo_taxidog = Taxidog(preco=preco, tempo_ida=tempo_ida, tempo_volta=tempo_volta)
             session.add(novo_taxidog)
             session.commit()
-            QMessageBox.information(self, "Sucesso", "TaxiDog adicionado com sucesso!")
-        else:
-            QMessageBox.warning(self, "Erro", "Preencha todos os campos.")
 
     def atualizar_taxidog(self):
-        preco = self.preco_taxidog_input.text()
-        taxidog = session.query(Taxidog).filter(Taxidog.preco == preco).first()
-        if taxidog:
-            tempo_ida = self.tempo_ida_input.text()
-            tempo_volta = self.tempo_volta_input.text()
-            if tempo_ida:
-                taxidog.tempo_ida = tempo_ida
-            if tempo_volta:
-                taxidog.tempo_volta = tempo_volta
-            session.commit()
-            QMessageBox.information(self, "Sucesso", "TaxiDog atualizado com sucesso!")
-        else:
-            QMessageBox.warning(self, "Erro", "TaxiDog não encontrado.")
+        id_taxidog, ok = QInputDialog.getInt(self, "Atualizar Taxidog", "Digite o ID do Taxidog:")
+        if ok:
+            taxidog = session.query(Taxidog).filter_by(id=id_taxidog).first()
+            if taxidog:
+                preco, ok_preco = QInputDialog.getDouble(self, "Atualizar Taxidog", "Preço:", QLineEdit.Normal, taxidog.preco)
+                tempo_ida, ok_tempo_ida = QInputDialog.getInt(self, "Atualizar Taxidog", "Tempo de Ida:", QLineEdit.Normal, taxidog.tempo_ida)
+                tempo_volta, ok_tempo_volta = QInputDialog.getInt(self, "Atualizar Taxidog", "Tempo de Volta:", QLineEdit.Normal, taxidog.tempo_volta)
 
-def iniciar_interface():
-    app = QApplication(sys.argv)
-    interface = Interface()
-    interface.show()
-    sys.exit(app.exec_())
+                if ok_preco and ok_tempo_ida and ok_tempo_volta:
+                    taxidog.preco = preco
+                    taxidog.tempo_ida = tempo_ida
+                    taxidog.tempo_volta = tempo_volta
+                    session.commit()
+
+    def deletar_taxidog(self):
+        id_taxidog, ok = QInputDialog.getInt(self, "Deletar Taxidog", "Digite o ID do Taxidog para excluir:")
+        if ok:
+            taxidog = session.query(Taxidog).filter_by(id=id_taxidog).first()
+            if taxidog:
+                session.delete(taxidog)
+                session.commit()
+
+    def listar_taxidog(self):
+        taxidogs = session.query(Taxidog).all()
+        colunas = ['id', 'preco', 'tempo_ida', 'tempo_volta']
+        self.exibir_dados(taxidogs, colunas)
 
 if __name__ == "__main__":
-    iniciar_interface()
+    app = QApplication(sys.argv)
+    window = PetshopApp()
+    sys.exit(app.exec_())
