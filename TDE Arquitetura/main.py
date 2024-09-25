@@ -1,12 +1,12 @@
 import os
 import time
 from sqlalchemy import create_engine, Column, Integer, String, Text, Numeric, ForeignKey
-from sqlalchemy.orm import sessionmaker, relationship, declarative_base  # Mudança aqui
+from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 
 DATABASE_URL = "mysql+pymysql://root:@localhost/tde"
 
 engine = create_engine(DATABASE_URL)
-Base = declarative_base()  # Função movida para sqlalchemy.orm
+Base = declarative_base()
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
@@ -14,7 +14,7 @@ session = Session()
 
 class Cliente(Base):
     __tablename__ = 'clientes'
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False, unique=True)
     nome = Column(String(255), nullable=False)
     telefone = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False)
@@ -322,7 +322,7 @@ def principal():
             id_taxa = int(input("ID da taxa de transporte: "))
             deletar_taxidog(id_taxa)
         
-        time.sleep(2)
+        time.sleep(3)
 
 if __name__ == "__main__":
     principal()
