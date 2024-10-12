@@ -41,6 +41,20 @@
             "database": "tde",
             "username": "root",
             "password": ""
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "TDE",
+            "database": "mercearia",
+            "username": "root",
+            "password": ""
         }
     ]
 }
