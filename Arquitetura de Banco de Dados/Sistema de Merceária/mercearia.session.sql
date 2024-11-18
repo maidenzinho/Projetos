@@ -1,6 +1,6 @@
 -- Criar o banco de dados
-CREATE DATABASE IF NOT EXISTS loja;
-USE loja;
+CREATE DATABASE IF NOT EXISTS mercearia;
+USE mercearia;
 
 -- Tabela de Categorias
 CREATE TABLE `categorias` (

@@ -1,6 +1,5 @@
 import sys
-import hashlib
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QInputDialog, QLineEdit, QTabWidget, QPushButton, QLabel, QMessageBox
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QInputDialog, QLineEdit, QTabWidget, QPushButton, QHBoxLayout, QLabel, QMessageBox
 from sqlalchemy import create_engine, Column, Integer, String, Text, Numeric, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 
@@ -45,17 +44,9 @@ class Taxidog(Base):
     tempo_ida = Column(Integer, nullable=False)
     tempo_volta = Column(Integer, nullable=False)
 
-class Usuario(Base):
-    __tablename__ = 'usuarios'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    usuario = Column(String(50), unique=True, nullable=False)
-    senha = Column(String(255), nullable=False)
-    tipo = Column(String(10), nullable=False)  # 'admin' ou 'funcionario'
-
 class PetshopApp(QWidget):
-    def __init__(self, usuario):
+    def __init__(self):
         super().__init__()
-        self.usuario = usuario
         self.setWindowTitle("Petshop")
         self.setGeometry(100, 100, 900, 600)
 
@@ -71,13 +62,6 @@ class PetshopApp(QWidget):
         self.criar_aba_taxidog()
 
         self.show()
-
-    def permitir_acao(self):
-        if self.usuario.tipo == 'admin':
-            return True
-        else:
-            QMessageBox.warning(self, "Acesso negado", "Você não tem permissão para realizar essa ação.")
-            return False
 
     def criar_aba_cliente(self):
         aba_cliente = QWidget()
@@ -195,8 +179,6 @@ class PetshopApp(QWidget):
         self.abas.removeTab(index)
 
     def adicionar_cliente(self):
-        if not self.permitir_acao():
-            return
         nome, ok_nome = QInputDialog.getText(self, "Adicionar Cliente", "Nome do Cliente:")
         telefone, ok_telefone = QInputDialog.getText(self, "Adicionar Cliente", "Telefone do Cliente:")
         email, ok_email = QInputDialog.getText(self, "Adicionar Cliente", "Email do Cliente:")
@@ -206,8 +188,6 @@ class PetshopApp(QWidget):
             session.commit()
 
     def atualizar_cliente(self):
-        if not self.permitir_acao():
-            return
         id_cliente, ok = QInputDialog.getInt(self, "Atualizar Cliente", "Digite o ID do Cliente:")
         if ok:
             cliente = session.query(Cliente).filter_by(id=id_cliente).first()
@@ -223,8 +203,6 @@ class PetshopApp(QWidget):
                     session.commit()
 
     def deletar_cliente(self):
-        if not self.permitir_acao():
-            return
         id_cliente, ok = QInputDialog.getInt(self, "Deletar Cliente", "Digite o ID do Cliente para excluir:")
         if ok:
             cliente = session.query(Cliente).filter_by(id=id_cliente).first()
@@ -238,8 +216,6 @@ class PetshopApp(QWidget):
         self.exibir_dados(clientes, colunas)
 
     def adicionar_pet(self):
-        if not self.permitir_acao():
-            return
         nome, ok_nome = QInputDialog.getText(self, "Adicionar Pet", "Nome do Pet:")
         especie, ok_especie = QInputDialog.getText(self, "Adicionar Pet", "Espécie do Pet:")
         raca, ok_raca = QInputDialog.getText(self, "Adicionar Pet", "Raça do Pet:")
@@ -251,8 +227,6 @@ class PetshopApp(QWidget):
             session.commit()
 
     def atualizar_pet(self):
-        if not self.permitir_acao():
-            return
         id_pet, ok = QInputDialog.getInt(self, "Atualizar Pet", "Digite o ID do Pet:")
         if ok:
             pet = session.query(Pet).filter_by(id=id_pet).first()
@@ -270,8 +244,6 @@ class PetshopApp(QWidget):
                     session.commit()
 
     def deletar_pet(self):
-        if not self.permitir_acao():
-            return
         id_pet, ok = QInputDialog.getInt(self, "Deletar Pet", "Digite o ID do Pet para excluir:")
         if ok:
             pet = session.query(Pet).filter_by(id=id_pet).first()
@@ -285,8 +257,6 @@ class PetshopApp(QWidget):
         self.exibir_dados(pets, colunas)
 
     def adicionar_servico(self):
-        if not self.permitir_acao():
-            return
         nome, ok_nome = QInputDialog.getText(self, "Adicionar Serviço", "Nome do Serviço:")
         descricao, ok_descricao = QInputDialog.getText(self, "Adicionar Serviço", "Descrição do Serviço:")
         preco, ok_preco = QInputDialog.getDouble(self, "Adicionar Serviço", "Preço do Serviço:")
@@ -296,8 +266,6 @@ class PetshopApp(QWidget):
             session.commit()
 
     def atualizar_servico(self):
-        if not self.permitir_acao():
-            return
         id_servico, ok = QInputDialog.getInt(self, "Atualizar Serviço", "Digite o ID do Serviço:")
         if ok:
             servico = session.query(Servico).filter_by(id=id_servico).first()
@@ -313,8 +281,6 @@ class PetshopApp(QWidget):
                     session.commit()
 
     def deletar_servico(self):
-        if not self.permitir_acao():
-            return
         id_servico, ok = QInputDialog.getInt(self, "Deletar Serviço", "Digite o ID do Serviço para excluir:")
         if ok:
             servico = session.query(Servico).filter_by(id=id_servico).first()
@@ -328,19 +294,15 @@ class PetshopApp(QWidget):
         self.exibir_dados(servicos, colunas)
 
     def adicionar_taxidog(self):
-        if not self.permitir_acao():
-            return
         preco, ok_preco = QInputDialog.getDouble(self, "Adicionar Taxidog", "Preço do TaxiDog:")
         tempo_ida, ok_tempo_ida = QInputDialog.getInt(self, "Adicionar Taxidog", "Tempo de Ida (min):")
-        tempo_volta, ok_tempo_volta = QInputDialog.getInt(self, "Adicionar Taxidog", "Tempo de Volta (min):")
+        tempo_volta, ok_tempo_volta = QInputDialog.getInt(self, "Adicionar Taxidog", "Tempo de Volta ( min):")
         if ok_preco and ok_tempo_ida and ok_tempo_volta:
             novo_taxidog = Taxidog(preco=preco, tempo_ida=tempo_ida, tempo_volta=tempo_volta)
             session.add(novo_taxidog)
             session.commit()
 
     def atualizar_taxidog(self):
-        if not self.permitir_acao():
-            return
         id_taxidog, ok = QInputDialog.getInt(self, "Atualizar Taxidog", "Digite o ID do Taxidog:")
         if ok:
             taxidog = session.query(Taxidog).filter_by(id=id_taxidog).first()
@@ -356,8 +318,6 @@ class PetshopApp(QWidget):
                     session.commit()
 
     def deletar_taxidog(self):
-        if not self.permitir_acao():
-            return
         id_taxidog, ok = QInputDialog.getInt(self, "Deletar Taxidog", "Digite o ID do Taxidog para excluir:")
         if ok:
             taxidog = session.query(Taxidog).filter_by(id=id_taxidog).first()
@@ -367,7 +327,7 @@ class PetshopApp(QWidget):
 
     def listar_taxidog(self):
         taxidogs = session.query(Taxidog).all()
-        colunas = ['id', 'preco', 'tempo_id a', 'tempo_volta']
+        colunas = ['id', 'preco', 'tempo_ida', 'tempo_volta']
         self.exibir_dados(taxidogs, colunas)
 
 class LoginWindow(QWidget):
@@ -399,19 +359,18 @@ class LoginWindow(QWidget):
         usuario = self.input_usuario.text()
         senha = self.input_senha.text()
 
-        usuario_db = session.query(Usuario).filter_by(usuario=usuario).first()
-        if usuario_db and usuario_db.senha == hashlib.sha256(senha.encode()).hexdigest():
+        if usuario == "admin" and senha == "senha123":
             self.close()
-            self.abrir_app(usuario_db)
+            self.abrir_app()
         else:
-            QMessageBox.warning(self, "Erro de Login", "Usuário ou senha incorretos.")
+            QMessageBox.warning(self, "Erro", "Usuário ou senha inválidos!")
 
-    def abrir_app(self, usuario):
-        self.petshop_app = PetshopApp(usuario)
-        self.petshop_app.show()
+    def abrir_app(self):
+        self.app = PetshopApp()
+        self.app.show()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    login_window = LoginWindow()
-    login_window.show()
+    login = LoginWindow()
+    login.show()
     sys.exit(app.exec_())
