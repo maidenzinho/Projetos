@@ -4,12 +4,10 @@ from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
-# Configuração do banco de dados
 URL_BANCO = "mysql+pymysql://root:@localhost/tde"
 engine = create_engine(URL_BANCO)
 Base = declarative_base()
 
-# Modelos de dados
 class Autor(Base):
     __tablename__ = 'autores'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -49,7 +47,6 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 sessao = Session()
 
-# Classe de Login
 class LoginApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -83,7 +80,6 @@ class LoginApp(QWidget):
         username = self.username_input.text()
         password = self.password_input.text()
 
-        # Consultar o banco de dados para verificar as credenciais
         usuario = sessao.query(Usuario).filter_by(username=username, password=password).first()
 
         if usuario:
@@ -98,9 +94,8 @@ class Usuario(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(255), nullable=False)
     password = Column(String(255), nullable=False)
-    role = Column(String(50), nullable=False)  # Pode ser 'gerente' ou 'bibliotecario'
+    role = Column(String(50), nullable=False)
 
-# Classe Principal
 class MainApp(QWidget):
     def __init__(self, is_manager):
         super().__init__()
@@ -146,7 +141,6 @@ class MainApp(QWidget):
         self.frete_window = FreteApp(is_manager=self.is_manager)
         self.frete_window.show()
 
-# Classe AutorApp
 class AutorApp(QWidget):
     def __init__(self, is_manager):
         super().__init__()
@@ -196,7 +190,6 @@ class AutorApp(QWidget):
             sessao.commit()
             self.carregar_autores()
 
-# Classe EditoraApp
 class EditoraApp(QWidget):
     def __init__(self, is_manager):
         super().__init__()
@@ -246,7 +239,6 @@ class EditoraApp(QWidget):
             sessao.commit()
             self.carregar_editoras()
 
-# Classe LivroApp
 class LivroApp(QWidget):
     def __init__(self, is_manager):
         super().__init__()
@@ -298,7 +290,6 @@ class LivroApp(QWidget):
             sessao.commit()
             self.carregar_livros()
 
-# Classe FreteApp
 class FreteApp(QWidget):
     def __init__(self, is_manager):
         super().__init__()
